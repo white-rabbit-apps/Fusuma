@@ -56,7 +56,10 @@ public final class FusumaViewController: UIViewController {
         case Video
     }
     
-    var mode: Mode = Mode.Camera
+    public var hasVideo = false
+    
+    var mode: Mode = Mode.Library
+
     public var modeOrder: FusumaModeOrder = .LibraryFirst
     var willFilter = true
 
@@ -164,7 +167,7 @@ public final class FusumaViewController: UIViewController {
         libraryButton.clipsToBounds = true
         videoButton.clipsToBounds = true
 
-        changeMode(Mode.Library)
+         changeMode(Mode.Camera)
         
         photoLibraryViewerContainer.addSubview(albumView)
         cameraShotContainer.addSubview(cameraView)
@@ -176,6 +179,25 @@ public final class FusumaViewController: UIViewController {
 //            libraryFirstConstraints.forEach { $0.priority = 250 }
 //            cameraFirstConstraints.forEach { $0.priority = 1000 }
 //        }
+        
+        if !hasVideo {
+            
+            videoButton.removeFromSuperview()
+            
+            self.view.addConstraint(NSLayoutConstraint(
+                item:       self.view,
+                attribute:  .Trailing,
+                relatedBy:  .Equal,
+                toItem:     cameraButton,
+                attribute:  .Trailing,
+                multiplier: 1.0,
+                constant:   0
+                )
+            )
+            
+            self.view.layoutIfNeeded()
+        }
+
     }
     
     override public func viewWillAppear(animated: Bool) {
@@ -334,7 +356,6 @@ private extension FusumaViewController {
     func dishighlightButtons() {
         cameraButton.tintColor  = fusumaBaseTintColor
         libraryButton.tintColor = fusumaBaseTintColor
-        videoButton.tintColor = fusumaBaseTintColor
         
         if cameraButton.layer.sublayers?.count > 1 {
             
@@ -360,15 +381,20 @@ private extension FusumaViewController {
             }
         }
         
-        if videoButton.layer.sublayers?.count > 1 {
+        if let videoButton = videoButton {
             
-            for layer in videoButton.layer.sublayers! {
+            videoButton.tintColor = fusumaBaseTintColor
+            
+            if videoButton.layer.sublayers?.count > 1 {
                 
-                if let borderColor = layer.borderColor where UIColor(CGColor: borderColor) == fusumaTintColor {
+                for layer in videoButton.layer.sublayers! {
                     
-                    layer.removeFromSuperlayer()
+                    if let borderColor = layer.borderColor where UIColor(CGColor: borderColor) == fusumaTintColor {
+                        
+                        layer.removeFromSuperlayer()
+                    }
+                    
                 }
-                
             }
         }
         
