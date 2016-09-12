@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Fusuma
+
 
 class ViewController: UIViewController, FusumaDelegate {
     
@@ -33,12 +35,13 @@ class ViewController: UIViewController, FusumaDelegate {
         // Show Fusuma
         let fusuma = FusumaViewController()
         fusuma.delegate = self
+        fusuma.hasVideo = true
         self.presentViewController(fusuma, animated: true, completion: nil)
         
     }
     
     // MARK: FusumaDelegate Protocol
-    func fusumaImageSelected(image: UIImage) {
+    func fusumaImageSelected(image: UIImage, creationDate:NSDate?) {
         
         print("Image selected")
         imageView.image = image
