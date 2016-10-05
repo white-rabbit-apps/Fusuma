@@ -142,20 +142,15 @@ final class FSCameraView: UIView, UIGestureRecognizerDelegate {
     }
     
     deinit {
-        
         NotificationCenter.default.removeObserver(self)
     }
     
     func startCamera() {
-        
         let status = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
         
         if status == AVAuthorizationStatus.authorized {
-            
             session?.startRunning()
-            
         } else if status == AVAuthorizationStatus.denied || status == AVAuthorizationStatus.restricted {
-            
             session?.stopRunning()
         }
     }
@@ -167,7 +162,6 @@ final class FSCameraView: UIView, UIGestureRecognizerDelegate {
     @IBAction func shotButtonPressed(_ sender: UIButton) {
         
         guard let imageOutput = imageOutput else {
-            
             return
         }
         
@@ -217,13 +211,16 @@ final class FSCameraView: UIView, UIGestureRecognizerDelegate {
                     // The center coordinate along Y axis
                     let rcy = ih * 0.5
                     
-                    let imageRef = image.cgImage?.cropping(to: CGRect(x: rcy-iw*0.5, y: 0 , width: iw, height: iw))
+                    //for flipped camera View
+                    var imageRef = image.cgImage?.cropping(to: CGRect(x: rcy/2, y: rcy/2-iw/2-200 , width: iw-iw/3, height: iw))
                     
-                    
+                    if !self.isFlipped{
+                        imageRef = image.cgImage!.cropping(to: CGRect(x: rcy/2, y: rcy/2+100 , width: iw-iw/3, height: iw))
+                    }
                     
                     DispatchQueue.main.async(execute: { () -> Void in
                         if fusumaCropImage {
-                            let resizedImage = UIImage(cgImage: imageRef!, scale: sw/iw, orientation: image.imageOrientation)
+                            let resizedImage = UIImage(cgImage: imageRef!,  scale: sw/iw, orientation: image.imageOrientation)
                             delegate.cameraShotFinished(resizedImage)
                         } else {
                             delegate.cameraShotFinished(image)
@@ -240,7 +237,7 @@ final class FSCameraView: UIView, UIGestureRecognizerDelegate {
             
         })
     }
-    
+    var isFlipped : Bool = false
     @IBAction func flipButtonPressed(_ sender: UIButton) {
         
         if !cameraIsAvailable() {
@@ -283,6 +280,11 @@ final class FSCameraView: UIView, UIGestureRecognizerDelegate {
         }
         
         session?.startRunning()
+        if isFlipped {
+            isFlipped = false
+        } else {
+            isFlipped = true
+        }
     }
     
     @IBAction func flashButtonPressed(_ sender: UIButton) {
@@ -406,10 +408,10 @@ extension FSCameraView {
         let status = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
         
         if status == AVAuthorizationStatus.authorized {
-            
             return true
         }
         
         return false
     }
 }
+
